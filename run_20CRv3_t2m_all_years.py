@@ -3,8 +3,8 @@
 #------------------------------------------------------------------------------
 # PROGRAM: run_20CRv3_t2m_all_years.py
 #------------------------------------------------------------------------------
-# Version 0.2
-# 1 March, 2021
+# Version 0.3
+# 5 March, 2021
 # Michael Taylor
 # https://patternizer.github.io
 # patternizer AT gmail DOT com
@@ -49,7 +49,9 @@ def make_shell_command(year):
 if __name__ == "__main__":
     
     year1 = 1806
-    year2 = 1808
-    for year in range(year1,year2):                        
-        make_shell_command(year)       
+    year2 = 1815
+    for year in range(year1,year2):
+        file_out = 'TMP2m_{0}_mnmean.tar'.format(year)                       
+        if not os.path.exists(file_out):
+            make_shell_command(year)       
 
