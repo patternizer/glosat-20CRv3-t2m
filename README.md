@@ -77,6 +77,8 @@ For example, for January 2015:
 
 ![image](https://github.com/patternizer/glosat-20CRv3-t2m/blob/master/t2m_2015_01.png)
 
+Design: Cartopy implementation inspired by the Basemap dark theme for python developed by [Zack Labe](https://twitter.com/ZLabe)
+
 * Animating summary plots:
 
 An animated GIF can be generated with:
@@ -87,6 +89,20 @@ and converted to MP4 with:
 
     $ ffmpeg -i t2m.gif -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" t2m.mp4
     
+[MP4 #01](https://www.youtube.com/watch?v=Hiwu2cC2vLM): 20CRv3 2m-temperature ensemble mean monthly anomalies 1806-2015 yearly contactsheets 
+[MP4 #02](https://www.youtube.com/watch?v=GFPU8-2qOoU): 20CRv3 2m-temperature ensemble mean January anomalies 1806-2015
+[MP4 #03](https://www.youtube.com/watch?v=-d45CTuEGF0): 20CRv3 2m-temperature ensemble mean February anomalies 1806-2015
+[MP4 #04](https://www.youtube.com/watch?v=5NPQ_hUsDOw): 20CRv3 2m-temperature ensemble mean March anomalies 1806-2015
+[MP4 #05](https://www.youtube.com/watch?v=dRYn1P3SctE): 20CRv3 2m-temperature ensemble mean April anomalies 1806-2015
+[MP4 #06](https://www.youtube.com/watch?v=YeTou8AKB8Q): 20CRv3 2m-temperature ensemble mean May anomalies 1806-2015
+[MP4 #07](https://www.youtube.com/watch?v=Nz-vgylgGUU): 20CRv3 2m-temperature ensemble mean June anomalies 1806-2015
+[MP4 #08](https://www.youtube.com/watch?v=pnj6muQGS0I): 20CRv3 2m-temperature ensemble mean July anomalies 1806-2015
+[MP4 #09](https://www.youtube.com/watch?v=ZtI2Ftepq7E): 20CRv3 2m-temperature ensemble mean August anomalies 1806-2015
+[MP4 #10](https://www.youtube.com/watch?v=p7Ysf2ZnM-s): 20CRv3 2m-temperature ensemble mean September anomalies 1806-2015
+[MP4 #11](https://www.youtube.com/watch?v=KhAf15wyGSs): 20CRv3 2m-temperature ensemble mean October anomalies 1806-2015
+[MP4 #12](https://www.youtube.com/watch?v=2yKlBpDpzHE): 20CRv3 2m-temperature ensemble mean November anomalies 1806-2015
+[MP4 #13](https://www.youtube.com/watch?v=-i2HcU3Tags): 20CRv3 2m-temperature ensemble mean December anomalies 1806-2015
+
 ## License
 
 The code is distributed under terms and conditions of the [Open Government License](http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/).
