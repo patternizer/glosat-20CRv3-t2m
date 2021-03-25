@@ -1,0 +1,218 @@
+# /ENSEMBLE/
+
+# ------------------------------------------------------------------------------------------
+# [DONE] calculate ensemble member normals and absolute and anomaly timeseries
+# ------------------------------------------------------------------------------------------
+
+for i in {001..080}; do mkdir $i; done &
+for i in {001..080}; do cd $i; ln -s ../../{1961..1990}/*$i.nc .; cd ../ ; done &
+for i in {001..080}; do cd $i/; cdo ensmean *.nc normals.nc; cd ../; done &
+for i in {001..080}; do cd $i; ln -s ../../{1805..2015}/*$i.nc .; cd ../ ; done &
+for i in {001..080}; do cd $i/; cdo -a mergetime TMP2m*.nc absolutes.nc; cd ../; done &
+for i in {001..080}; do cd $i/; cdo sub absolutes.nc normals.nc anomalies.nc; cd ../; done &
+for i in {001..080}; do cd $i/; rm TMP2m*; cd ../; done &
+
+# ------------------------------------------------------------------------------------------
+# [DONE] regrid ABSOLUTES to 5x5
+# ------------------------------------------------------------------------------------------
+
+mkdir absolutes-5x5 
+cd absolutes-5x5
+
+ln -s ../../grid* .
+for i in {001..080}; do ln -s ../$i/*absolutes.nc .; done &
+for i in {001..080}; do cdo -a remapdis,grid5x5.cdo ${i}_absolutes.nc ${i}_absolutes_5x5.nc; done &
+cdo ensmean *_absolutes_5x5.nc ensemble_absolutes_5x5_mean.nc 
+cdo ensstd1 *_absolutes_5x5.nc ensemble_absolutes_5x5_sd.nc
+cdo ensmin *_absolutes_5x5.nc ensemble_absolutes_5x5_min.nc
+cdo ensmax *_absolutes_5x5.nc ensemble_absolutes_5x5_max.nc
+cdo enspctl,5 *_absolutes_5x5.nc ensemble_absolutes_5x5_pctl_05.nc
+cdo enspctl,10 *_absolutes_5x5.nc ensemble_absolutes_5x5_pctl_10.nc
+cdo enspctl,25 *_absolutes_5x5.nc ensemble_absolutes_5x5_pctl_25.nc
+cdo enspctl,50 *_absolutes_5x5.nc ensemble_absolutes_5x5_pctl_50.nc
+cdo enspctl,75 *_absolutes_5x5.nc ensemble_absolutes_5x5_pctl_75.nc
+cdo enspctl,90 *_absolutes_5x5.nc ensemble_absolutes_5x5_pctl_90.nc
+cdo enspctl,95 *_absolutes_5x5.nc ensemble_absolutes_5x5_pctl_95.nc
+
+# ------------------------------------------------------------------------------------------
+# [DONE] regrid ANOMALIES to 5x5
+# ------------------------------------------------------------------------------------------
+
+mkdir anomalies-5x5 
+cd anomalies-5x5
+
+ln -s ../../grid* .
+for i in {001..080}; do ln -s ../$i/*anomalies.nc .; done &
+for i in {001..080}; do cdo -a remapdis,grid5x5.cdo ${i}_anomalies.nc ${i}_anomalies_5x5.nc; done &
+cdo ensmean *_anomalies_5x5.nc ensemble_anomalies_5x5_mean.nc 
+cdo ensstd1 *_anomalies_5x5.nc ensemble_anomalies_5x5_sd.nc
+cdo ensmin *_anomalies_5x5.nc ensemble_anomalies_5x5_min.nc
+cdo ensmax *_anomalies_5x5.nc ensemble_anomalies_5x5_max.nc
+cdo enspctl,5 *_anomalies_5x5.nc ensemble_anomalies_5x5_pctl_05.nc
+cdo enspctl,10 *_anomalies_5x5.nc ensemble_anomalies_5x5_pctl_10.nc
+cdo enspctl,25 *_anomalies_5x5.nc ensemble_anomalies_5x5_pctl_25.nc
+cdo enspctl,50 *_anomalies_5x5.nc ensemble_anomalies_5x5_pctl_50.nc
+cdo enspctl,75 *_anomalies_5x5.nc ensemble_anomalies_5x5_pctl_75.nc
+cdo enspctl,90 *_anomalies_5x5.nc ensemble_anomalies_5x5_pctl_90.nc
+cdo enspctl,95 *_anomalies_5x5.nc ensemble_anomalies_5x5_pctl_95.nc
+
+# ------------------------------------------------------------------------------------------
+# [DONE] calculate ABSOLUTES global field mean timeseries statistics
+# ------------------------------------------------------------------------------------------
+
+mkdir absolutes-global
+cd absolutes-global
+
+for i in {001..080}; do ln -s ../$i/*absolutes.nc .; done &
+for i in {001..080}; do cdo fldmean ${i}_absolutes.nc ${i}_absolutes_global.nc; done &
+cdo ensmean *_absolutes_global.nc ensemble_absolutes_global_mean.nc 
+cdo ensstd1 *_absolutes_global.nc ensemble_absolutes_global_sd.nc
+cdo ensmin *_absolutes_global.nc ensemble_absolutes_global_min.nc
+cdo ensmax *_absolutes_global.nc ensemble_absolutes_global_max.nc
+cdo enspctl,5 *_absolutes_global.nc ensemble_absolutes_global_pctl_05.nc
+cdo enspctl,10 *_absolutes_global.nc ensemble_absolutes_global_pctl_10.nc
+cdo enspctl,25 *_absolutes_global.nc ensemble_absolutes_global_pctl_25.nc
+cdo enspctl,50 *_absolutes_global.nc ensemble_absolutes_global_pctl_50.nc
+cdo enspctl,75 *_absolutes_global.nc ensemble_absolutes_global_pctl_75.nc
+cdo enspctl,90 *_absolutes_global.nc ensemble_absolutes_global_pctl_90.nc
+cdo enspctl,95 *_absolutes_global.nc ensemble_absolutes_global_pctl_95.nc
+
+# ------------------------------------------------------------------------------------------
+# [DONE] calculate ABSOLUTES NH field mean timeseries statistics
+# ------------------------------------------------------------------------------------------
+
+mkdir absolutes-nh
+cd absolutes-nh
+
+for i in {001..080}; do ln -s ../$i/*absolutes.nc .; done &
+for i in {001..080}; do cdo fldmean -sellonlatbox,-180.0,180.0,0.0,90.0 ${i}_absolutes.nc ${i}_absolutes_nh.nc; done &
+cdo ensmean *_absolutes_nh.nc ensemble_absolutes_nh_mean.nc 
+cdo ensstd1 *_absolutes_nh.nc ensemble_absolutes_nh_sd.nc
+cdo ensmin *_absolutes_nh.nc ensemble_absolutes_nh_min.nc
+cdo ensmax *_absolutes_nh.nc ensemble_absolutes_nh_max.nc
+cdo enspctl,5 *_absolutes_nh.nc ensemble_absolutes_nh_pctl_05.nc
+cdo enspctl,10 *_absolutes_nh.nc ensemble_absolutes_nh_pctl_10.nc
+cdo enspctl,25 *_absolutes_nh.nc ensemble_absolutes_nh_pctl_25.nc
+cdo enspctl,50 *_absolutes_nh.nc ensemble_absolutes_nh_pctl_50.nc
+cdo enspctl,75 *_absolutes_nh.nc ensemble_absolutes_nh_pctl_75.nc
+cdo enspctl,90 *_absolutes_nh.nc ensemble_absolutes_nh_pctl_90.nc
+cdo enspctl,95 *_absolutes_nh.nc ensemble_absolutes_nh_pctl_95.nc
+
+# ------------------------------------------------------------------------------------------
+# [DONE] calculate ABSOLUTES SH field mean timeseries statistics 
+# ------------------------------------------------------------------------------------------
+
+mkdir absolutes-sh
+cd absolutes-sh
+
+for i in {001..080}; do ln -s ../$i/*absolutes.nc .; done &
+for i in {001..080}; do cdo fldmean -sellonlatbox,-180.0,180.0,-90.0,0.0 ${i}_absolutes.nc ${i}_absolutes_sh.nc; done &
+cdo ensmean *_absolutes_sh.nc ensemble_absolutes_sh_mean.nc 
+cdo ensstd1 *_absolutes_sh.nc ensemble_absolutes_sh_sd.nc
+cdo ensmin *_absolutes_sh.nc ensemble_absolutes_sh_min.nc
+cdo ensmax *_absolutes_sh.nc ensemble_absolutes_sh_max.nc
+cdo enspctl,5 *_absolutes_sh.nc ensemble_absolutes_sh_pctl_05.nc
+cdo enspctl,10 *_absolutes_sh.nc ensemble_absolutes_sh_pctl_10.nc
+cdo enspctl,25 *_absolutes_sh.nc ensemble_absolutes_sh_pctl_25.nc
+cdo enspctl,50 *_absolutes_sh.nc ensemble_absolutes_sh_pctl_50.nc
+cdo enspctl,75 *_absolutes_sh.nc ensemble_absolutes_sh_pctl_75.nc
+cdo enspctl,90 *_absolutes_sh.nc ensemble_absolutes_sh_pctl_90.nc
+cdo enspctl,95 *_absolutes_sh.nc ensemble_absolutes_sh_pctl_95.nc
+
+# ------------------------------------------------------------------------------------------
+# [DONE] calculate ANOMALIES global field mean timeseries statistics
+# ------------------------------------------------------------------------------------------
+
+mkdir anomalies-global
+cd anomalies-global
+
+for i in {001..080}; do ln -s ../$i/*anomalies.nc .; done &
+for i in {001..080}; do cdo fldmean ${i}_anomalies.nc ${i}_anomalies_global.nc; done &
+cdo ensmean *_anomalies_global.nc ensemble_anomalies_global_mean.nc 
+cdo ensstd1 *_anomalies_global.nc ensemble_anomalies_global_sd.nc
+cdo ensmin *_anomalies_global.nc ensemble_anomalies_global_min.nc
+cdo ensmax *_anomalies_global.nc ensemble_anomalies_global_max.nc
+cdo enspctl,5 *_anomalies_global.nc ensemble_anomalies_global_pctl_05.nc
+cdo enspctl,10 *_anomalies_global.nc ensemble_anomalies_global_pctl_10.nc
+cdo enspctl,25 *_anomalies_global.nc ensemble_anomalies_global_pctl_25.nc
+cdo enspctl,50 *_anomalies_global.nc ensemble_anomalies_global_pctl_50.nc
+cdo enspctl,75 *_anomalies_global.nc ensemble_anomalies_global_pctl_75.nc
+cdo enspctl,90 *_anomalies_global.nc ensemble_anomalies_global_pctl_90.nc
+cdo enspctl,95 *_anomalies_global.nc ensemble_anomalies_global_pctl_95.nc
+
+# ------------------------------------------------------------------------------------------
+# [DONE] calculate ANOMALIES NH field mean timeseries statistics
+# ------------------------------------------------------------------------------------------
+
+mkdir anomalies-nh
+cd anomalies-nh
+
+for i in {001..080}; do ln -s ../$i/*anomalies.nc .; done &
+for i in {001..080}; do cdo fldmean -sellonlatbox,-180.0,180.0,0.0,90.0 ${i}_anomalies.nc ${i}_anomalies_nh.nc; done &
+cdo ensmean *_anomalies_nh.nc ensemble_anomalies_nh_mean.nc 
+cdo ensstd1 *_anomalies_nh.nc ensemble_anomalies_nh_sd.nc
+cdo ensmin *_anomalies_nh.nc ensemble_anomalies_nh_min.nc
+cdo ensmax *_anomalies_nh.nc ensemble_anomalies_nh_max.nc
+cdo enspctl,5 *_anomalies_nh.nc ensemble_anomalies_nh_pctl_05.nc
+cdo enspctl,10 *_anomalies_nh.nc ensemble_anomalies_nh_pctl_10.nc
+cdo enspctl,25 *_anomalies_nh.nc ensemble_anomalies_nh_pctl_25.nc
+cdo enspctl,50 *_anomalies_nh.nc ensemble_anomalies_nh_pctl_50.nc
+cdo enspctl,75 *_anomalies_nh.nc ensemble_anomalies_nh_pctl_75.nc
+cdo enspctl,90 *_anomalies_nh.nc ensemble_anomalies_nh_pctl_90.nc
+cdo enspctl,95 *_anomalies_nh.nc ensemble_anomalies_nh_pctl_95.nc
+
+# ------------------------------------------------------------------------------------------
+# [DONE] calculate ANOMALIES SH field mean timeseries statistics
+# ------------------------------------------------------------------------------------------
+
+mkdir anomalies-sh
+cd anomalies-sh
+
+for i in {001..080}; do ln -s ../$i/*anomalies.nc .; done &
+for i in {001..080}; do cdo fldmean -sellonlatbox,-180.0,180.0,-90.0,0.0 ${i}_anomalies.nc ${i}_anomalies_sh.nc; done &
+cdo ensmean *_anomalies_sh.nc ensemble_anomalies_sh_mean.nc 
+cdo ensstd1 *_anomalies_sh.nc ensemble_anomalies_sh_sd.nc
+cdo ensmin *_anomalies_sh.nc ensemble_anomalies_sh_min.nc
+cdo ensmax *_anomalies_sh.nc ensemble_anomalies_sh_max.nc
+cdo enspctl,5 *_anomalies_sh.nc ensemble_anomalies_sh_pctl_05.nc
+cdo enspctl,10 *_anomalies_sh.nc ensemble_anomalies_sh_pctl_10.nc
+cdo enspctl,25 *_anomalies_sh.nc ensemble_anomalies_sh_pctl_25.nc
+cdo enspctl,50 *_anomalies_sh.nc ensemble_anomalies_sh_pctl_50.nc
+cdo enspctl,75 *_anomalies_sh.nc ensemble_anomalies_sh_pctl_75.nc
+cdo enspctl,90 *_anomalies_sh.nc ensemble_anomalies_sh_pctl_90.nc
+cdo enspctl,95 *_anomalies_sh.nc ensemble_anomalies_sh_pctl_95.nc
+
+# ------------------------------------------------------------------------------------------
+# KITCHEN SINK
+# ------------------------------------------------------------------------------------------
+
+# Add member number prefix:
+
+for i in {001..080}
+do
+    for file in $i/*
+    do
+      fname=${file##*/}   # This gives your base filename.
+      fpath=${file%/*}    # Your dir
+      dname=${fpath##*/}
+      mv $file ${fpath}/${dname}_${fname}
+#     echo ${fpath}/${dname}_${fname}
+    done
+done 
+
+#
+# merge large number of netcdfs with CDO (single call limit=256)
+#
+
+i=1
+for X in `ls -1 *nc`
+do       
+    cdo merge $X temp.nc out.nc       
+    i=`expr $i+1`       
+    if [i!=200];  #This is the run so you want to keep out as your final output       
+    then            
+        mv out.nc temp.nc ##### for use in future merges.  This will build up as $X nc files get merged to it.
+done
+
+
+
