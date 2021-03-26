@@ -13,6 +13,9 @@ SLURM shell templates and python script generator code to download and process m
 * `extract_timeseries_and_compare_anomalies.py` - python script to extract the 20CRv3 monthly mean absolute temperature timeseries co-located with GloSAT.p03 station data relative to the 1961-1990 baseline mean
 * `plot_ensemble_mean_monthly_anomalies_contactsheet.py` - python script to plot yearly contact sheets of 12-monthly global ensemble mean maps in Orthographic projection (centred on the Greenwich meridian)
 * `plot_ensemble_mean_monthly_anomalies_months1-12.py` - python script to plot monthly ensemble mean maps in Robinson projection (centred on the Greenwich meridian)
+* `plot-20CRv3-versus-glosat-maps-darktheme.py` - python script to plot global gridded (5x5) observations from GloSAT.p03 against regridded 20CRv3 monthly temperature anomalies
+* `plot-20CRv3-versus-datasets-maps-darktheme.py` - python script to plot global gridded (5x5) observations from GloSAT.p03, CRUTEM5 and HadCRUT5 against regridded 20CRv3 monthly temperature anomalies
+* `make_gif.py` - python script to create animated GIF from PNG plots output by the map plotting routines
 
 The first step is to clone the latest glosat-20CRv3-t2m code into your /home/users/ folder on JASMIN and step into the installed Github directory: 
 
