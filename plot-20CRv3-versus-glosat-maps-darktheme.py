@@ -3,8 +3,8 @@
 #------------------------------------------------------------------------------
 # PROGRAM: plot-prelim-maps.py
 #------------------------------------------------------------------------------
-# Version 0.1
-# 24 March, 2021
+# Version 0.2
+# 25 March, 2021
 # Michael Taylor
 # https://patternizer.github.io
 # patternizer AT gmail DOT com
@@ -65,11 +65,12 @@ titletime = str(currentdy) + '/' + currentmn + '/' + currentyr
 # SETTINGS: 
 #------------------------------------------------------------------------------
 
-use_obs = 'HadCRUT'
+use_obs = 'GloSAT'
 #use_obs = 'CRUTEM'
-#use_obs = 'GloSAT'
+#use_obs = 'HadCRUT'
 use_minmax = False
 use_horizontal_colorbar = False
+use_mask = False
 use_gridliner = True
 cmap = 'coolwarm'
 fontsize = 14
@@ -93,7 +94,6 @@ if projection == 'lambertconformal': p = ccrs.LambertConformal(central_longitude
 #----------------------------------------------------------------------------
 
 matplotlib.rcParams['text.usetex'] = False
-#rcParams['font.family'] = 'sans-serif'
 rcParams['font.family'] = ['DejaVu Sans']
 rcParams['font.sans-serif'] = ['Avant Garde']
 plt.rc('text',color='white')
@@ -134,24 +134,24 @@ authorstr = r'$\bf{Graphic}$' + ': Michael Taylor, CRU/UEA' + ' -- ' + titletime
 # load .nc file (netcdf4) into xarray
 
 if use_obs == 'GloSAT':
-    filename_glosat = 'DATA/GloSAT.prelim03_reqSD_standardgrid-178101-202012.nc'
+    filename_GloSAT = 'DATA/GloSAT.prelim03_reqSD_standardgrid-178101-202012.nc'
 elif use_obs == 'CRUTEM':
-    filename_glosat = 'DATA/CRUTEM.5.0.1.0.anomalies.nc'
+    filename_GloSAT = 'DATA/CRUTEM.5.0.1.0.anomalies.nc'
 else:
-    filename_glosat = 'DATA/HadCRUT.5.0.1.0.anomalies.ensemble_mean.nc'
-filename_cr20v3 = 'ensemble_anomalies_5x5_mean.nc'
+    filename_GloSAT = 'DATA/HadCRUT.5.0.1.0.anomalies.ensemble_mean.nc'
+filename_20CRv3 = 'ensemble_anomalies_5x5_mean.nc'
 
-ds_glosat = xr.open_dataset(filename_glosat, decode_cf=True) 
-lat_glosat = np.array(ds_glosat.latitude)
-lon_glosat = np.array(ds_glosat.longitude)
-time_glosat = np.array(ds_glosat.time)
-t_glosat = [ str(time_glosat[i])[0:7] for i in range(len(time_glosat)) ]
+ds_GloSAT = xr.open_dataset(filename_GloSAT, decode_cf=True) 
+lat_GloSAT = np.array(ds_GloSAT.latitude)
+lon_GloSAT = np.array(ds_GloSAT.longitude)
+time_GloSAT = np.array(ds_GloSAT.time)
+t_GloSAT = [ str(time_GloSAT[i])[0:7] for i in range(len(time_GloSAT)) ]
 
-ds_cr20v3 = xr.open_dataset(filename_cr20v3, decode_cf=True) 
-lat_cr20v3 = np.array(ds_cr20v3.lat)
-lon_cr20v3 = np.array(ds_cr20v3.lon) - 180
-time_cr20v3 = pd.date_range(start='1806', periods=len(np.array(ds_cr20v3.time)), freq='M') 
-t_cr20v3 = [ str(time_cr20v3[i])[0:7] for i in range(len(time_cr20v3)) ]
+ds_20CRv3 = xr.open_dataset(filename_20CRv3, decode_cf=True) 
+lat_20CRv3 = np.array(ds_20CRv3.lat)
+lon_20CRv3 = np.array(ds_20CRv3.lon) - 180
+time_20CRv3 = pd.date_range(start='1806', periods=len(np.array(ds_20CRv3.time)), freq='M') 
+t_20CRv3 = [ str(time_20CRv3[i])[0:7] for i in range(len(time_20CRv3)) ]
 
 if use_obs == 'GloSAT':
     timeshift = -300 # months between 1806-01 (start of 20CRv3) and 1781-01 (start of GloSAT.p03)
@@ -168,23 +168,25 @@ else:
 #nstart = 1631 # --> 1880-01 
 #nstart = 1391 # --> 1900-01
 #nstart = 791  # --> 1950-01
-#nstart = 191  # --> 2000-01
+nstart = 191  # --> 2000-01
 
-# len(time_glosat = 2052
-# len(time_cr20v3 = 2520
-print('GloSAT:' + str(len(t_glosat)))
-print('20CRv3:' + str(len(t_cr20v3)))
+nGloSAT = 2880
+timeshift_CRUTEM = 828
+timeshift_HadCRUT = 828
+timeshift_20CRv3 = 300
 
-for i in range(len(time_cr20v3)-timeshift-nstart-1,len(time_cr20v3)-timeshift-nstart): 
+x, y = np.meshgrid(lon_GloSAT, lat_GloSAT)    
 
-    filestr = use_obs.lower() + '_' + "temperature_anomaly" + "_" + t_glosat[i] + ".png"
+for i in range(len(time_20CRv3)-timeshift-nstart-1,len(time_20CRv3)-timeshift-nstart): 
+
+    filestr = use_obs.lower() + '_' + "temperature_anomaly" + "_" + t_GloSAT[i] + ".png"
     if use_obs == 'GloSAT':
-        titlestr1 = 'GloSAT.p03: ' + t_glosat[i]
+        titlestr1 = 'GloSAT.p03: ' + r'$\bf{{{a}}}$'.format(a=t_GloSAT[i])
     elif use_obs == 'CRUTEM':
-        titlestr1 = 'CRUTEM5.0.1.0: ' + t_glosat[i]
+        titlestr1 = 'CRUTEM5.0.1.0: ' + r'$\bf{{{a}}}$'.format(a=t_GloSAT[i])
     else:
-        titlestr1 = 'HadCRUT5.0.1.0: ' + t_glosat[i]
-    titlestr2 = 'CR20v3: ' + t_cr20v3[i + timeshift]
+        titlestr1 = 'HadCRUT5.0.1.0: ' + r'$\bf{{{a}}}$'.format(a=t_GloSAT[i])
+    titlestr2 = '20CRv3: ' + r'$\bf{{{a}}}$'.format(a=t_GloSAT[i])
     colorbarstr = r'Temperature anomaly (from 1961-1990) [$^{\circ}$C]'
 
     fig  = plt.figure(figsize=(15,10))
@@ -192,99 +194,99 @@ for i in range(len(time_cr20v3)-timeshift-nstart-1,len(time_cr20v3)-timeshift-ns
     ax1 = fig.add_subplot(211, projection=p)
 
     if use_obs == 'GloSAT':
-        v = ds_glosat.temperature_anomaly[i,:,:]
-    elif use_obs == 'CRUTEM':
-        v = ds_glosat.tas[i,:,:]
+        v = ds_GloSAT.temperature_anomaly[i,:,:]
+        make_plot = True
+    elif use_obs == 'CRUTEM':    
+        if i >= timeshift_CRUTEM:
+            v = ds_GloSAT.tas[i-timeshift_CRUTEM,:,:]
+            make_plot = True
+        else:
+            make_plot = False
     else:
-        v = ds_glosat.tas_mean[i,:,:]
-    x, y = np.meshgrid(lon_glosat, lat_glosat)    
-    if use_minmax == True:    
+        if i >= timeshift_HadCRUT:
+            v = ds_GloSAT.tas_mean[i-timeshift_HadCRUT,:,:]
+            make_plot = True
+        else:
+            make_plot = False
+    if use_minmax == True: 
         vmin = np.min(v); vmax = np.max(v)
+    else: 
+        vmin = -5.0; vmax = +5.0    
+    if make_plot == True:
+        g = v.plot( ax = ax1, transform=ccrs.PlateCarree(), vmin=vmin, vmax=vmax, cmap=cmap, cbar_kwargs={'orientation':'vertical','extend':'both','shrink':0.8, 'pad':0.1})         
+        cb = g.colorbar; cb.ax.tick_params(labelsize=fontsize); cb.set_label(label = r'T2m Anomaly [$^{\circ}$C]', size=fontsize)
     else:
-        vmin = -5.0; vmax = +5.0
-    
-    g = v.plot( ax = ax1, transform=ccrs.PlateCarree(), vmin=vmin, vmax=vmax, cmap=cmap, cbar_kwargs={'orientation':'vertical','extend':'both','shrink':0.8, 'pad':0.1, 'label':r'T2m Anomaly [$^{\circ}$C]'})         
-#    cb = g.colorbar
-#    cb.ax.tick_params(labelsize=fontsize)
+        v = ds_20CRv3.TMP2m[0,0,:,:] * np.nan
+        g = v.plot( ax = ax1, transform=ccrs.PlateCarree(), vmin=vmin, vmax=vmax, cmap=cmap, cbar_kwargs={'orientation':'vertical','extend':'both','shrink':0.8, 'pad':0.1})         
+        cb = g.colorbar; cb.ax.tick_params(labelsize=fontsize); cb.set_label(label = r'T2m Anomaly [$^{\circ}$C]', size=fontsize)
+    ax1.set_global()        
+    ax1.coastlines(color='grey')
+    ax1.set_title(titlestr1, fontsize=fontsize)    
 
     if use_gridliner == True:
+        
+        gl = ax1.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1, color='white', alpha=0.2, linestyle='-')
+        gl.xlabels_top = False; gl.xlabels_bottom = False; gl.ylabels_left = False; gl.ylabels_right = False
+        gl.xlines = True; gl.ylines = True
+        gl.xlocator = mticker.FixedLocator(np.linspace(-180,180,73)) # every 5 degrees
+        gl.ylocator = mticker.FixedLocator(np.linspace(-90,90,37))   # every 5 degrees
+        gl.xformatter = LONGITUDE_FORMATTER; gl.yformatter = LATITUDE_FORMATTER
 
-        ax1.set_global()
-        ax1.coastlines(color='grey')
+    if use_mask == True:
+
         g = ccrs.Geodetic()
         trans = ax1.projection.transform_points(g, x, y)
         x0 = trans[:,:,0]
         x1 = trans[:,:,1]    
-        gl = ax1.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1, color='white', alpha=0.2, linestyle='-')
-        gl.xlabels_top = False
-        gl.xlabels_bottom = False
-        gl.ylabels_left = False
-        gl.ylabels_right = False
-        gl.xlines = True
-        gl.ylines = True
-        gl.xlocator = mticker.FixedLocator(np.linspace(-180,180,73)) # every 5 degrees
-        gl.ylocator = mticker.FixedLocator(np.linspace(-90,90,37))   # every 5 degrees
-        gl.xformatter = LONGITUDE_FORMATTER
-        gl.yformatter = LATITUDE_FORMATTER
-#        for mask in (x0>threshold,x0<=threshold):
-#            im1 = ax1.pcolor(ma.masked_where(mask, x0), ma.masked_where(mask, x1), ma.masked_where(mask, v), vmin=vmin, vmax=vmax, transform=ax1.projection, cmap=cmap) 
-#        im1.set_clim(vmin,vmax)    
-        ax1.set_title(titlestr1, fontsize=fontsize)    
-
+        for mask in (x0>threshold,x0<=threshold):
+            im1 = ax1.pcolor(ma.masked_where(mask, x0), ma.masked_where(mask, x1), ma.masked_where(mask, v), vmin=vmin, vmax=vmax, transform=ax1.projection, cmap=cmap) 
+        im1.set_clim(vmin,vmax)    
+        
     ax2 = fig.add_subplot(212, projection=p)
 
-    v = ds_cr20v3.TMP2m[i+timeshift,0,:,:]
-    x, y = np.meshgrid(lon_cr20v3, lat_cr20v3)    
+    if i >= timeshift_20CRv3:
+        v = ds_20CRv3.TMP2m[i-timeshift_20CRv3,0,:,:]        
+        make_plot = True
+    else:            
+        make_plot = False
     if use_minmax == True:    
         vmin = np.min(v); vmax = np.max(v)
     else:
         vmin = -5.0; vmax = +5.0
-
-    g = v.plot( ax = ax2, transform=ccrs.PlateCarree(), vmin=vmin, vmax=vmax, cmap=cmap, cbar_kwargs={'orientation':'vertical','extend':'both','shrink':0.8, 'pad':0.1, 'label':r'T2m Anomaly [$^{\circ}$C]'})         
-#    cb = g.colorbar
-#    cb.ax.tick_params(labelsize=fontsize)
+    if make_plot == True:
+        g = v.plot( ax = ax2, transform=ccrs.PlateCarree(), vmin=vmin, vmax=vmax, cmap=cmap, cbar_kwargs={'orientation':'vertical','extend':'both','shrink':0.8, 'pad':0.1})         
+        cb = g.colorbar; cb.ax.tick_params(labelsize=fontsize); cb.set_label(label = r'T2m Anomaly [$^{\circ}$C]', size=fontsize)
+    else:
+        v = ds_20CRv3.TMP2m[0,0,:,:] * np.nan
+        g = v.plot( ax = ax2, transform=ccrs.PlateCarree(), vmin=vmin, vmax=vmax, cmap=cmap, cbar_kwargs={'orientation':'vertical','extend':'both','shrink':0.8, 'pad':0.1})         
+        cb = g.colorbar; cb.ax.tick_params(labelsize=fontsize); cb.set_label(label = r'T2m Anomaly [$^{\circ}$C]', size=fontsize)
+    ax2.set_global()
+    ax2.coastlines(color='grey')
+    ax2.set_title(titlestr2, fontsize=fontsize)    
 
     if use_gridliner == True:
+        gl = ax2.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1, color='black', alpha=0.2, linestyle='-')
+        gl.xlabels_top = False; gl.xlabels_bottom = False; gl.ylabels_left = False; gl.ylabels_right = False
+        gl.xlines = True; gl.ylines = True
+        gl.xlocator = mticker.FixedLocator(np.linspace(-180,180,73)) # every 5 degrees
+        gl.ylocator = mticker.FixedLocator(np.linspace(-90,90,37))   # every 5 degrees
+        gl.xformatter = LONGITUDE_FORMATTER; gl.yformatter = LATITUDE_FORMATTER
 
-        ax2.set_global()
-        ax2.coastlines()
+    if use_mask == True:
         g = ccrs.Geodetic()
         trans = ax2.projection.transform_points(g, x, y)
         x0 = trans[:,:,0]
         x1 = trans[:,:,1]    
-        gl = ax2.gridlines(crs=ccrs.PlateCarree(), draw_labels=True, linewidth=1, color='black', alpha=0.2, linestyle='-')
-        gl.xlabels_top = False
-        gl.xlabels_bottom = False
-        gl.ylabels_left = False
-        gl.ylabels_right = False
-        gl.xlines = True
-        gl.ylines = True
-        gl.xlocator = mticker.FixedLocator(np.linspace(-180,180,73)) # every 5 degrees
-        gl.ylocator = mticker.FixedLocator(np.linspace(-90,90,37))   # every 5 degrees
-        gl.xformatter = LONGITUDE_FORMATTER
-        gl.yformatter = LATITUDE_FORMATTER
+        for mask in (x0>threshold,x0<=threshold):
+            im2 = ax2.pcolor(ma.masked_where(mask, x0), ma.masked_where(mask, x1), ma.masked_where(mask, v), vmin=vmin, vmax=vmax, transform=ax2.projection, cmap=cmap) 
+        im2.set_clim(vmin,vmax)    
 
-#        for mask in (x0>threshold,x0<=threshold):
-#            im2 = ax2.pcolor(ma.masked_where(mask, x0), ma.masked_where(mask, x1), ma.masked_where(mask, v), vmin=vmin, vmax=vmax, transform=ax2.projection, cmap=cmap) 
-#        im2.set_clim(vmin,vmax)    
-        ax2.set_title(titlestr2, fontsize=fontsize)    
-
-#    if use_horizontal_colorbar == True:
-#        cb = fig.colorbar(im1, ax=[ax1, ax2], orientation="horizontal", shrink=0.5, extend='both')
-#        cb.set_label(colorbarstr, labelpad=5, fontsize=fontsize)
-#        cb.ax.tick_params(labelsize=fontsize)
-#    else:
-#        cb = fig.colorbar(im1, ax=[ax1, ax2], shrink=0.8, extend='both')
-#        cb.set_label(colorbarstr, rotation=90, labelpad=25, fontsize=fontsize)
-#        cb.ax.tick_params(labelsize=fontsize)
-
-#    fig.suptitle(titlestr, fontsize=24, color='white', fontweight='bold')        
-    plt.annotate(sourcestr1, xy=(150,110), xycoords='figure pixels', color='white', fontsize=fontsize) 
-    plt.annotate(sourcestr2, xy=(150,80), xycoords='figure pixels', color='white', fontsize=fontsize) 
-    plt.annotate(baselinestr, xy=(150,50), xycoords='figure pixels', color='white', fontsize=fontsize)   
-    plt.annotate(authorstr, xy=(150,20), xycoords='figure pixels', color='white', fontsize=fontsize, bbox=dict(boxstyle="square, pad=0.3", fc='black', edgecolor='white', linewidth=0.2))     
+    fig.suptitle(titlestr, fontsize=24, color='white', fontweight='bold')        
+    plt.annotate(sourcestr1, xy=(200,110), xycoords='figure pixels', color='white', fontsize=fontsize) 
+    plt.annotate(sourcestr2, xy=(200,80), xycoords='figure pixels', color='white', fontsize=fontsize) 
+    plt.annotate(baselinestr, xy=(200,50), xycoords='figure pixels', color='white', fontsize=fontsize)   
+    plt.annotate(authorstr, xy=(200,20), xycoords='figure pixels', color='white', fontsize=fontsize, bbox=dict(boxstyle="square, pad=0.3", fc='black', edgecolor='white', linewidth=0.2))     
     fig.subplots_adjust(left=None, bottom=0.2, right=None, top=None, wspace=None, hspace=None)
-
     plt.savefig(filestr)
     plt.close('all')
     
